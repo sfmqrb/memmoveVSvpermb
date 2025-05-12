@@ -148,15 +148,13 @@ const __m512i SHUFFLE[] = {S0, S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11, S12
 // Shift right by k bytes using memmove (in-place) 
 inline void shift_right_memmove(uint8_t* data, int k) {
     std::memmove(data + k, data, 64 - k);
-    std::memset(data, 0, k);
 }
 
-// Shift right by k bytes using AVX-512 VPERMB (in-place)
+// Shift right at byte offset k using AVX-512 VPERMB (in-place)
 inline void shift_right_vpermb(uint8_t* data, int k) {
     __m512i v = _mm512_loadu_si512((const __m512i*)data);
     __m512i shuffled = _mm512_permutexvar_epi8(SHUFFLE[k], v);
     _mm512_storeu_si512((__m512i*)data, shuffled);
-    std::memset(data, 0, k);
 }
 
 int main() {
