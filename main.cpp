@@ -145,9 +145,8 @@ const __m512i SHUFFLE[] = {S0, S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11, S12
                           S50, S51, S52, S53, S54, S55, S56, S57, S58, S59, S60, S61, 
                           S62, S63};
 
-// Shift right by k bytes using memmove (in-place) 
 inline void shift_right_memmove(uint8_t* data, int k) {
-    std::memmove(data + k, data, 64 - k);
+    std::memmove(data + k + 1, data + k, 64 - k - 1);
 }
 
 // Shift right at byte offset k using AVX-512 VPERMB (in-place)
@@ -177,6 +176,12 @@ int main() {
         shifts_vp[i]  = k_dist(rng);
     }
 
+    // print all the elements of the first array
+    for (int i = 0; i < 64; ++i) {
+        std::printf("%d ", data_mem[0][i]);
+    }
+    std::printf("\n");
+
     // Benchmark memmove version (in-place)
     auto t0 = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < N; ++i) {
@@ -184,6 +189,13 @@ int main() {
     }
     auto t1 = std::chrono::high_resolution_clock::now();
     auto dt_mem = std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count();
+
+    // print all elements of the first array 
+    for (int i = 0; i < 64; ++i) {
+        std::printf("%d ", data_mem[0][i]);
+    }
+    std::printf("\n");
+
 
     // Benchmark VPERMB version (in-place)
     auto t2 = std::chrono::high_resolution_clock::now();
